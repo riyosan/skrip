@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 import pyarrow as pa
 import seaborn as sns
-# from apps.praproses import preprocessing2
+from apps.praproses import preprocessing2
 import os
 from dateutil import parser
 import joblib
@@ -184,19 +184,19 @@ def app():
       st.write(" ")
       st.write(" ")      
 
-      # #take df3 from apps/praproses.py
-      # df1 = preprocessing2()
-      # var_enrolled = df1['enrolled']
-      # # #membagi menjadi train dan test untuk mencari user id
-      # X_train, X_test, y_train, y_test = train_test_split(df1, df1['enrolled'], test_size=(100-split_size)/100, random_state=111)
-      # train_id = X_train['user']
-      # test_id = X_test['user']
-      # #menggabungkan semua
-      # y_pred_series = pd.Series(y_test).rename('Aktual',inplace=True)
-      # hasil_akhir = pd.concat([y_pred_series, test_id], axis=1).dropna()
-      # hasil_akhir['Prediksi']=y_test_pred
-      # hasil_akhir = hasil_akhir[['user','Aktual','Prediksi']].reset_index(drop=True)
-      # container_hasil_akhir = st.columns((0.9, 1.2, 0.9))
-      # with container_hasil_akhir[1]:
-      #   st.text('Tabel Perbandingan Asli dan Prediksi:\n ')
-      #   st.dataframe(hasil_akhir)
+      #take df3 from apps/praproses.py
+      df1 = preprocessing2()
+      var_enrolled = df1['enrolled']
+      # #membagi menjadi train dan test untuk mencari user id
+      X_train, X_test, y_train, y_test = train_test_split(df1, df1['enrolled'], test_size=(100-split_size)/100, random_state=111)
+      train_id = X_train['user']
+      test_id = X_test['user']
+      #menggabungkan semua
+      y_pred_series = pd.Series(y_test).rename('Aktual',inplace=True)
+      hasil_akhir = pd.concat([y_pred_series, test_id], axis=1).dropna()
+      hasil_akhir['Prediksi']=y_test_pred
+      hasil_akhir = hasil_akhir[['user','Aktual','Prediksi']].reset_index(drop=True)
+      container_hasil_akhir = st.columns((0.9, 1.2, 0.9))
+      with container_hasil_akhir[1]:
+        st.text('Tabel Perbandingan Asli dan Prediksi:\n ')
+        st.dataframe(hasil_akhir)
