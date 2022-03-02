@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 import pyarrow as pa
 import seaborn as sns
-from apps.praproses import *
+# from apps.praproses import preprocessing2
 import os
 from dateutil import parser
 import joblib
@@ -19,14 +19,14 @@ from sklearn.model_selection import train_test_split
 from sklearn.naive_bayes import GaussianNB
 
 # @st.experimental_memo
-def sidebar():
-  # Sidebar - Specify parameter settings
-  with st.sidebar.header('2. Set Parameter'):
-    split_size = st.sidebar.slider('Rasio Pembagian Data (% Untuk Data Latih)', 10, 90, 80, 5)
-    jumlah_fitur = st.sidebar.slider('jumlah pilihan fitur (Untuk Data Latih)', 5, 47, 20, 5)
-    parameter_n_estimators = st.sidebar.slider('Number of estimators (n_estimators)', 10, 100, 50, 10)
-    tetangga = st.sidebar.slider('Jumlah K (KNN)', 11, 101, 55, 11)
-  return split_size, jumlah_fitur, parameter_n_estimators, tetangga
+# def sidebar():
+#   # Sidebar - Specify parameter settings
+#   with st.sidebar.header('2. Set Parameter'):
+#     split_size = st.sidebar.slider('Rasio Pembagian Data (% Untuk Data Latih)', 10, 90, 80, 5)
+#     jumlah_fitur = st.sidebar.slider('jumlah pilihan fitur (Untuk Data Latih)', 5, 47, 20, 5, key='jumlah_fitur')
+#     parameter_n_estimators = st.sidebar.slider('Number of estimators (n_estimators)', 10, 100, 50, 10, key='n_estimators')
+#     tetangga = st.sidebar.slider('Jumlah K (KNN)', 11, 101, 55, 11, key='tetangga')
+#   return split_size, jumlah_fitur, parameter_n_estimators, tetangga
 
 @st.experimental_memo
 def load_data():
@@ -110,12 +110,17 @@ def app():
     st.markdown("Please upload data through `Home` page!")
   else:
     # sidebar()
-    split_size, jumlah_fitur, parameter_n_estimators, tetangga = sidebar()
+    # split_size, jumlah_fitur, parameter_n_estimators, tetangga = sidebar()
+    with st.sidebar.header('2. Set Parameter'):
+      split_size = st.sidebar.slider('Rasio Pembagian Data (% Untuk Data Latih)', 10, 90, 80, 5)
+      jumlah_fitur = st.sidebar.slider('jumlah pilihan fitur (Untuk Data Latih)', 5, 47, 20, 5)
+      parameter_n_estimators = st.sidebar.slider('Number of estimators (n_estimators)', 10, 100, 50, 10)
+      tetangga = st.sidebar.slider('Jumlah K (KNN)', 11, 101, 55, 11)
     
     # --- Initialising SessionState ---
     if "load_state" not in st.session_state:
       st.session_state.load_state = False
-    if st.sidebar.button('Latih & Uji')or st.session_state.load_state:
+    if st.sidebar.button('Latih & Uji') or st.session_state.load_state:
       st.session_state.load_state = True
       # split_size, jumlah_fitur, parameter_n_estimators, tetangga = sidebar()
       df = load_data()
@@ -125,7 +130,6 @@ def app():
       matrik_nb, cm_label_nb, nb = naive_bayes(X_train, X_test, y_train, y_test)
       matrik_rf, cm_label_rf, rf = random_forest(X_train, X_test, y_train, y_test, parameter_n_estimators)
       matrik_stack, cm_label_stack, y_test_pred = stack_model(X_train, X_test, y_train, y_test, tetangga, nb, rf)
-
 
       nb_container = st.columns((1.1, 0.9))
       #page layout
@@ -180,19 +184,19 @@ def app():
       st.write(" ")
       st.write(" ")      
 
-      #take df3 from apps/praproses.py
-      df1 = preprocessing2()
-      var_enrolled = df1['enrolled']
-      # #membagi menjadi train dan test untuk mencari user id
-      X_train, X_test, y_train, y_test = train_test_split(df1, df1['enrolled'], test_size=(100-split_size)/100, random_state=111)
-      train_id = X_train['user']
-      test_id = X_test['user']
-      #menggabungkan semua
-      y_pred_series = pd.Series(y_test).rename('Aktual',inplace=True)
-      hasil_akhir = pd.concat([y_pred_series, test_id], axis=1).dropna()
-      hasil_akhir['Prediksi']=y_test_pred
-      hasil_akhir = hasil_akhir[['user','Aktual','Prediksi']].reset_index(drop=True)
-      container_hasil_akhir = st.columns((0.9, 1.2, 0.9))
-      with container_hasil_akhir[1]:
-        st.text('Tabel Perbandingan Asli dan Prediksi:\n ')
-        st.dataframe(hasil_akhir)
+      # #take df3 from apps/praproses.py
+      # df1 = preprocessing2()
+      # var_enrolled = df1['enrolled']
+      # # #membagi menjadi train dan test untuk mencari user id
+      # X_train, X_test, y_train, y_test = train_test_split(df1, df1['enrolled'], test_size=(100-split_size)/100, random_state=111)
+      # train_id = X_train['user']
+      # test_id = X_test['user']
+      # #menggabungkan semua
+      # y_pred_series = pd.Series(y_test).rename('Aktual',inplace=True)
+      # hasil_akhir = pd.concat([y_pred_series, test_id], axis=1).dropna()
+      # hasil_akhir['Prediksi']=y_test_pred
+      # hasil_akhir = hasil_akhir[['user','Aktual','Prediksi']].reset_index(drop=True)
+      # container_hasil_akhir = st.columns((0.9, 1.2, 0.9))
+      # with container_hasil_akhir[1]:
+      #   st.text('Tabel Perbandingan Asli dan Prediksi:\n ')
+      #   st.dataframe(hasil_akhir)
