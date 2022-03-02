@@ -26,6 +26,14 @@ def preprocessing():
   return df
 
 @st.experimental_memo
+def preprocessings(df):
+  # df=load_dataset()
+  #menghitung ulang isi dari kolom screen_litst karena tidak pas di kolom num screens
+  df['screen_list'] = df.screen_list.astype(str) + ','
+  df['num_screens'] = df.screen_list.astype(str).str.count(',')
+  return df
+
+@st.experimental_memo
 def preprocessing1():
   df1 = preprocessing()
   # df1=df.copy()
@@ -108,12 +116,64 @@ def funneling():
   # df1.to_csv('data/df1.csv', index=False)
   # return df_numerik
 def app():
-  dataset = st.sidebar.file_uploader("Unggah File CSV", type=['csv'])
-  if dataset is not None:
-    df = load_dataset(dataset)
-    st.dataframe(df)
+  with st.sidebar.header('1. Unggah Dataset'):
+    dataset = st.sidebar.file_uploader("Unggah File CSV", type=['csv'])
+    # st.text('Atau:\n ')
+
+  #initialize session state
+  if "load_state" not in st.session_state:
+    st.session_state.load_state = False
+  if dataset:
+    if "load_state" in st.session_state:
+      st.session_state.load_state
+      df=pd.read_csv(dataset)
+      st.write(dataset.name+" "+"berhasil diunggah")
+      st.dataframe(df)
+      df=preprocessings(df)
+      container = st.columns((1.9, 1.1))
+      df_types = df.dtypes.astype(str)
+
+      with container[0]:
+        st.write(df)
+        st.markdown('''
+        Merevisi kolom numscreens''')
+        # st.text('Merevisi kolom numscreens')
+      with container[1]:
+        st.write(df_types)
+        st.markdown('''
+        Merevisi kolom numscreens''')
+        # st.text('Tipe data setiap kolom')
+    # else:
+    #   df = load_state(dataset)
+      # st.session_state.load_state = df
+  # else:
+  # # if dataset is not None:
+  #   df = load_dataset()
+  #   # st.dataframe(df)
+  #   #initialize session state
+  #   if "load_state" not in st.session_state:
+  #     st.session_state.load_state = False
+  #   if st.button('Preprocess Data') or st.session_state.load_state:
+  #     st.session_state.load_state = True
+  #     st.write(df)
+  #     df = preprocessing()
+  #     container = st.columns(1.9, 1.1)
+  #     df_types = df.dtypes.astype(str)
+
+  #     with container[0]:
+  #       st.write(df)
+  #       st.markdown('''
+  #       merevisi kolom numscreens''')
+  #       st.text('merevisi kolom numscreens')
+  #     with container[1]:
+  #       st.write(df_types)
+  #       st.markdown('''
+  #       Merevisi kolom numscreens''')
+  #       st.text('Tipe data setiap kolom')
   else:
-    load = st.button('load data')
+    with st.sidebar:
+      st.text('Atau:\n ')
+      load = st.sidebar.button('Press to use Example Dataset')
     #initialize session state
     if "load_state" not in st.session_state:
       st.session_state.load_state = False
